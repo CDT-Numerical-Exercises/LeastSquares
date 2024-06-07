@@ -29,4 +29,11 @@ add_executable(main main.cpp ${sources} ${headers})
 
 # add libraries
 find_package(GSL REQUIRED)
-target_link_libraries(main GSL::gsl GSL::gslcblas)
+
+# add Boost libraries
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.71.0 COMPONENTS iostreams system filesystem)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(main GSL::gsl GSL::gslcblas ${Boost_LIBRARIES})
