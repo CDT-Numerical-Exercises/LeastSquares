@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <gsl/gsl_matrix.h>
 
-void get_csv_dims(std::ifstream &csv_file, size_t &rows, size_t &cols, char delimeter = ',');
-gsl_matrix *load_csv_to_dmatrix(std::filesystem::path csv_path, char delimeter = ',');
+void get_csv_dims(std::ifstream &csv_file, size_t &rows, size_t &cols, const char delimeter = ',');
+gsl_matrix *load_csv_to_dmatrix(std::filesystem::path csv_path, const char delimeter = ',');
 
 #endif

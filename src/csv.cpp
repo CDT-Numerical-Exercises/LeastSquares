@@ -7,7 +7,7 @@
 
 #include "csv.h"
 
-void get_csv_dims(std::ifstream &csv_file, size_t &rows, size_t &cols, char delimeter) {
+void get_csv_dims(std::ifstream &csv_file, size_t &rows, size_t &cols, const char delimeter) {
   rows = 0;
   cols = 0;
 
@@ -44,13 +44,9 @@ void get_csv_dims(std::ifstream &csv_file, size_t &rows, size_t &cols, char deli
   csv_file.seekg (0, std::ios::beg);
 }
 
-gsl_matrix *load_csv_to_dmatrix(std::filesystem::path csv_path, char delimeter) {
-  size_t rows;
-  size_t cols;
-
-  std::ifstream csv_file(csv_path);
-  get_csv_dims(csv_file, rows, cols);
-
+// for when the dimensions of the matrix are already known
+gsl_matrix *load_csv_to_dmatrix_dims(std::ifstream &csv_file, const size_t rows,
+                                     const size_t cols, const char delimeter) {
   gsl_matrix *m = gsl_matrix_calloc(rows, cols);
 
   int i = 0;
@@ -67,6 +63,18 @@ gsl_matrix *load_csv_to_dmatrix(std::filesystem::path csv_path, char delimeter) 
       gsl_matrix_set(m, i, j, stod(col));
     }
   }
+
+  return m;
+}
+
+gsl_matrix *load_csv_to_dmatrix(std::filesystem::path csv_path, const char delimeter) {
+  size_t rows;
+  size_t cols;
+
+  std::ifstream csv_file(csv_path);
+  get_csv_dims(csv_file, rows, cols);
+
+  gsl_matrix *m = load_csv_to_dmatrix_dims(csv_file, rows, cols, delimeter);
 
   csv_file.close();
 
