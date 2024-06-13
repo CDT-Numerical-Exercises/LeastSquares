@@ -46,6 +46,9 @@ int main(int argc, char **argv) {
 
   // determine the weights
   // we will solve the weights using SVD
+  // the GSL documentation is *very* explicit about not calculating
+  // inverses unless you really have to, and suggests SVD as a more
+  // efficient and more accurate way of solving linear equations.
   // gsl_linalg_SV_solve solves the equation Ax = b
   //   if we let A = (B^T B),
   //             b = B^T y, then
