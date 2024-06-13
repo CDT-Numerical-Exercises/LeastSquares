@@ -1,6 +1,6 @@
 # Setup project
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project(BaseProject)
+project(LeastSquares)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,9 +24,6 @@ link_directories(${PROJECT_SOURCE_DIR}/lib)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 
-# add executable
-add_executable(main main.cpp ${sources} ${headers})
-
 # add libraries
 find_package(GSL REQUIRED)
 
@@ -36,4 +33,9 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.71.0 COMPONENTS iostreams system filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(main GSL::gsl GSL::gslcblas ${Boost_LIBRARIES})
+set(BUILD_LIBS GSL::gsl GSL::gslcblas ${Boost_LIBRARIES})
+
+# add executable
+add_executable(problem1 problem1.cpp ${sources} ${headers})
+
+target_link_libraries(problem1 ${BUILD_LIBS})
