@@ -21,6 +21,17 @@ double basis(const int base, const double t) {
   return std::sin(2.*M_PI*f*t);
 }
 
+constexpr size_t total_size(const size_t y_size) {
+  return y_size*BasisModes // B
+    + BasisModes*BasisModes // A
+    + BasisModes // b
+    + BasisModes // S
+    + BasisModes*BasisModes // V
+    + BasisModes // work
+    + BasisModes // w
+    ;
+}
+
 int main(int argc, char **argv) {
   if (argc < 2) {
     std::cerr << "Requires path to CSV file as arg." << std::endl;
@@ -34,8 +45,15 @@ int main(int argc, char **argv) {
   gsl_vector_view y_view = gsl_matrix_column(Y, 0);
   gsl_vector *y = &y_view.vector;
 
+  // allocate a contiguous array to store the rest of our data
+  std::cout << "Allocating array of " << sizeof(double)*total_size(y->size) << " bytes" << std::endl;
+  double *backing = new double[total_size(y->size)];
+  double *backing_head = backing;
+
   // create B
-  gsl_matrix *B = gsl_matrix_calloc(y->size, BasisModes);
+  gsl_matrix_view B_view = gsl_matrix_view_array(backing_head, y->size, BasisModes);
+  backing_head += (y->size * BasisModes);
+  gsl_matrix *B = &B_view.matrix;
   //   add the basis functions
   for (int b = 0; b < BasisModes; ++b) {
     gsl_vector_view v = gsl_matrix_column(B, b);
@@ -57,10 +75,14 @@ int main(int argc, char **argv) {
   // can avoid explicitly calculating the inverse
 
   // first calculate A and b
-  gsl_matrix *A = gsl_matrix_alloc(BasisModes, BasisModes);
+  gsl_matrix_view A_view = gsl_matrix_view_array(backing_head, BasisModes, BasisModes);
+  backing_head += (BasisModes*BasisModes);
+  gsl_matrix *A = &A_view.matrix;
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, B, B, 0, A);
 
-  gsl_vector *b = gsl_vector_alloc(BasisModes);
+  gsl_vector_view b_view = gsl_vector_view_array(backing_head, BasisModes);
+  backing_head += BasisModes;
+  gsl_vector *b = &b_view.vector;
   gsl_blas_dgemv(CblasTrans, 1, B, y, 0, b);
 
   // now find the decomposition of A
@@ -69,14 +91,20 @@ int main(int argc, char **argv) {
   // S is NxN diagonal (so should be a vector of length N)
   // V is NxN
   // we also need a workspace vector with length N
-  gsl_vector *S = gsl_vector_alloc(A->size2);
-  gsl_matrix *V = gsl_matrix_alloc(A->size2, A->size2);
-  double work_arr[A->size2];
-  gsl_vector_view work_view = gsl_vector_view_array(work_arr, A->size2);
+  gsl_vector_view S_view = gsl_vector_view_array(backing_head, BasisModes);
+  backing_head += BasisModes;
+  gsl_vector *S = &S_view.vector;
+  gsl_matrix_view V_view = gsl_matrix_view_array(backing_head, BasisModes, BasisModes);
+  backing_head += (BasisModes*BasisModes);
+  gsl_matrix *V = &V_view.matrix;
+  gsl_vector_view work_view = gsl_vector_view_array(backing_head, BasisModes);
+  backing_head += BasisModes;
   gsl_linalg_SV_decomp(A, V, S, &work_view.vector);
 
   // now we can solve for the weights
-  gsl_vector *w = gsl_vector_alloc(BasisModes);
+  gsl_vector_view w_view = gsl_vector_view_array(backing_head, BasisModes);
+  backing_head += BasisModes;
+  gsl_vector *w = &w_view.vector;
   gsl_linalg_SV_solve(A, V, S, b, w);
 
   std::cout << "Weights: ";
@@ -86,12 +114,7 @@ int main(int argc, char **argv) {
   const double w3 = gsl_vector_get(w, 2);
 
   // clean up what was used for calculating the weights
-  gsl_matrix_free(A);
-  gsl_vector_free(b);
-  gsl_vector_free(S);
-  gsl_matrix_free(V);
-  gsl_matrix_free(B);
-  gsl_vector_free(w);
+  delete [] backing;
 
   // plot the data and the fit
   constexpr double t_min = time(0);
