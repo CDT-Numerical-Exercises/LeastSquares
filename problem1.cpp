@@ -47,7 +47,8 @@ int main(int argc, char **argv) {
 
   // allocate a contiguous array to store the rest of our data
   std::cout << "Allocating array of " << sizeof(double)*total_size(y->size) << " bytes" << std::endl;
-  double *backing = new double[total_size(y->size)];
+  // double *backing = new double[total_size(y->size)];
+  double backing[total_size(y->size)];
   double *backing_head = backing;
 
   // create B
@@ -112,9 +113,6 @@ int main(int argc, char **argv) {
   const double w1 = gsl_vector_get(w, 0);
   const double w2 = gsl_vector_get(w, 1);
   const double w3 = gsl_vector_get(w, 2);
-
-  // clean up what was used for calculating the weights
-  delete [] backing;
 
   // plot the data and the fit
   constexpr double t_min = time(0);
