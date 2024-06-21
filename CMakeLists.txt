@@ -37,5 +37,7 @@ set(BUILD_LIBS GSL::gsl GSL::gslcblas ${Boost_LIBRARIES})
 
 # add executable
 add_executable(problem1 problem1.cpp ${sources} ${headers})
-
 target_link_libraries(problem1 ${BUILD_LIBS})
+
+add_executable(problem2 problem2.cpp ${sources} ${headers})
+target_link_libraries(problem2 ${BUILD_LIBS})
