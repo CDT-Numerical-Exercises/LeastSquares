@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <gsl/gsl_matrix.h>
