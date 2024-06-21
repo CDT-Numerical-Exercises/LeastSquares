@@ -78,8 +78,16 @@ int main(int argc, char **argv) {
   // perform the least squares fit
   gsl_multifit_linear(&basis_view.matrix, y, c, cov, &chi2, work);
 
-  std::cout << "Fit parameters: [  basis1   basis2   basis3  ]" << std::endl;
-  std::cout << "                ";
+  // std::cout << "Fit parameters: [  basis1   basis2   basis3  ]" << std::endl;
+  std::cout << "Fit parameters: ";
+  if (n_basis < 10) {
+    std::cout << "[ ";
+    for (int i = 0; i < n_basis; ++i) {
+      std::cout << " basis" << i + 1 << "  ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "                ";
+  }
   print_vector(c, 8);
 
   // plot the fit
@@ -132,8 +140,16 @@ int main(int argc, char **argv) {
   // perform the least squares fit
   gsl_multifit_linear(X, y, c, cov, &chi2, work);
   
-  std::cout << "Fit parameters: [  basis1   basis2   basis3  constant  linear  ]" << std::endl;
-  std::cout << "                ";
+  // std::cout << "Fit parameters: [  basis1   basis2   basis3  constant  linear  ]" << std::endl;
+  std::cout << "Fit parameters: ";
+  if (n_basis < 10) {
+    std::cout << "[ ";
+    for (int i = 0; i < n_basis; ++i) {
+      std::cout << " basis" << i + 1 << "  ";
+    }
+    std::cout << "constant  linear  ]" << std::endl;
+    std::cout << "                ";
+  }
   print_vector(c, 8);
 
   // plot the fit
