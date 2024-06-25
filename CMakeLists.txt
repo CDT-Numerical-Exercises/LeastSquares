@@ -41,3 +41,6 @@ target_link_libraries(problem1 ${BUILD_LIBS})
 
 add_executable(problem2 problem2.cpp ${sources} ${headers})
 target_link_libraries(problem2 ${BUILD_LIBS})
+
+add_executable(problem3 problem3.cpp ${sources} ${headers})
+target_link_libraries(problem3 ${BUILD_LIBS})
