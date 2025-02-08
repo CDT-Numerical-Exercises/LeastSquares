@@ -91,7 +91,7 @@ int main() {
   // define initial weight vectors
   constexpr int n_weights = 2;
   const double weights_true[n_weights] = { 0.5, 0.25 };
-  double weights[n_weights] = { 0.4, 0.7 };
+  double weights[n_weights] = { 0.7, 0.4 };
   gsl_vector_view w_view = gsl_vector_view_array(weights, 2);
   gsl_vector *w_vec = &w_view.vector;
   
